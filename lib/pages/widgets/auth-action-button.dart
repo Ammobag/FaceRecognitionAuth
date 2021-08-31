@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:face_net_authentication/pages/db/database.dart';
 import 'package:face_net_authentication/pages/models/user.model.dart';
 import 'package:face_net_authentication/pages/profile.dart';
@@ -41,7 +39,8 @@ class _AuthActionButtonState extends State<AuthActionButton> {
     String password = _passwordTextEditingController.text;
 
     /// creates a new user in the 'database'
-    await _dataBaseService.saveData(user, password, predictedData);
+    await _dataBaseService.saveData(user, password,
+        DateTime.now().millisecondsSinceEpoch.toString(), predictedData);
 
     /// resets the face stored in the face net sevice
     this._faceNetService.setPredictedData(null);
@@ -58,6 +57,7 @@ class _AuthActionButtonState extends State<AuthActionButton> {
           MaterialPageRoute(
               builder: (BuildContext context) => Profile(
                     this.predictedUser.user,
+                    this.predictedUser.id,
                     imagePath: _cameraService.imagePath,
                   )));
     } else {
@@ -73,8 +73,8 @@ class _AuthActionButtonState extends State<AuthActionButton> {
   }
 
   String _predictUser() {
-    String userAndPass = _faceNetService.predict();
-    return userAndPass ?? null;
+    String userPassAndId = _faceNetService.predict();
+    return userPassAndId ?? null;
   }
 
   @override
@@ -89,9 +89,9 @@ class _AuthActionButtonState extends State<AuthActionButton> {
 
           if (faceDetected) {
             if (widget.isLogin) {
-              var userAndPass = _predictUser();
-              if (userAndPass != null) {
-                this.predictedUser = User.fromDB(userAndPass);
+              var userPassAndId = _predictUser();
+              if (userPassAndId != null) {
+                this.predictedUser = User.fromDB(userPassAndId);
               }
             }
             PersistentBottomSheetController bottomSheetController =
