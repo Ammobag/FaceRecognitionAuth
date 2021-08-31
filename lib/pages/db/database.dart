@@ -34,10 +34,11 @@ class DataBaseService {
 
   /// [Name]: name of the new user
   /// [Data]: Face representation for Machine Learning model
-  Future saveData(
-      String user, String password, String id, List modelData) async {
-    String userPassAndId = user + ':' + password + ":" + id;
-    _db[userPassAndId] = modelData;
+  Future saveData(String user, String password, String id, String department,
+      String passingYear, List modelData) async {
+    String userData =
+        user + ':' + password + ":" + id + ":" + department + ":" + passingYear;
+    _db[userData] = modelData;
     jsonFile.writeAsStringSync(json.encode(_db));
   }
 

@@ -7,6 +7,7 @@ import 'package:face_net_authentication/services/facenet.service.dart';
 import 'package:flutter/material.dart';
 import '../home.dart';
 import 'app_text_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthActionButton extends StatefulWidget {
   AuthActionButton(this._initializeControllerFuture,
@@ -29,23 +30,43 @@ class _AuthActionButtonState extends State<AuthActionButton> {
       TextEditingController(text: '');
   final TextEditingController _passwordTextEditingController =
       TextEditingController(text: '');
-
+  final TextEditingController _idTextEditingController =
+      TextEditingController(text: '');
+  final TextEditingController _departmentTextEditingController =
+      TextEditingController(text: '');
+  final TextEditingController _passingYearEditingController =
+      TextEditingController(text: '');
   User predictedUser;
+
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
 
   Future _signUp(context) async {
     /// gets predicted data from facenet service (user face detected)
     List predictedData = _faceNetService.predictedData;
     String user = _userTextEditingController.text;
     String password = _passwordTextEditingController.text;
+    String id = _idTextEditingController.text;
+    String department = _departmentTextEditingController.text;
+    String passingYear = _passingYearEditingController.text;
 
     /// creates a new user in the 'database'
-    await _dataBaseService.saveData(user, password,
-        DateTime.now().millisecondsSinceEpoch.toString(), predictedData);
+    await _dataBaseService.saveData(
+        user, password, id, department, passingYear, predictedData);
+    await _addUserToFireStore(user);
 
     /// resets the face stored in the face net sevice
     this._faceNetService.setPredictedData(null);
     Navigator.push(context,
         MaterialPageRoute(builder: (BuildContext context) => MyHomePage()));
+  }
+
+  Future<void> _addUserToFireStore(String name) {
+    return users
+        .add({
+          'Name': name, // John Doe
+        })
+        .then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user: $error"));
   }
 
   Future _signIn(context) async {
@@ -58,6 +79,8 @@ class _AuthActionButtonState extends State<AuthActionButton> {
               builder: (BuildContext context) => Profile(
                     this.predictedUser.user,
                     this.predictedUser.id,
+                    this.predictedUser.department,
+                    this.predictedUser.passingYear,
                     imagePath: _cameraService.imagePath,
                   )));
     } else {
@@ -163,9 +186,28 @@ class _AuthActionButtonState extends State<AuthActionButton> {
             child: Column(
               children: [
                 !widget.isLogin
-                    ? AppTextField(
-                        controller: _userTextEditingController,
-                        labelText: "Your Name",
+                    ? Column(
+                        children: <Widget>[
+                          AppTextField(
+                            controller: _userTextEditingController,
+                            labelText: "Your Name",
+                          ),
+                          SizedBox(height: 10),
+                          AppTextField(
+                            controller: _idTextEditingController,
+                            labelText: "Id Number",
+                          ),
+                          SizedBox(height: 10),
+                          AppTextField(
+                            controller: _departmentTextEditingController,
+                            labelText: "Department",
+                          ),
+                          SizedBox(height: 10),
+                          AppTextField(
+                            controller: _passingYearEditingController,
+                            labelText: "Passing Year",
+                          ),
+                        ],
                       )
                     : Container(),
                 SizedBox(height: 10),

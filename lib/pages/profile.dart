@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 
 class Profile extends StatelessWidget {
-  const Profile(this.username, this.id, {Key key, this.imagePath})
+  const Profile(this.username, this.id, this.department, this.passingYear,
+      {Key key, this.imagePath})
       : super(key: key);
   final String username;
   final String id;
+  final String department;
+  final String passingYear;
   final String imagePath;
 
   final String githubURL =
@@ -67,8 +70,24 @@ class Profile extends StatelessWidget {
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.left,
                     ),
-                    Divider(
-                      height: 30,
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Your Department is :" + department,
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.left,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Your Passing Year is :" + passingYear,
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.left,
+                    ),
+                    SizedBox(
+                      height: 10,
                     ),
                   ],
                 ),
